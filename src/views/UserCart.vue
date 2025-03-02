@@ -74,8 +74,8 @@
                 <td>
                   <div class="input-group input-group-sm">
                     <label for="price">
-                      <input id="price" type="number" class="form-control"
-                      v-model.number="item.qty">
+                      <input id="price" type="number" class="form-control" min="1"
+                      v-model.number="item.qty" @change="updateCart(item)">
                     </label>
                     <div class="input-group-text">/{{ item.product.unit }}</div>
                   </div>
@@ -179,6 +179,20 @@ export default {
           this.isLoading = false;
           this.getCart();
         }
+      });
+    },
+    updateCart(item) {
+      const url = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/cart/${item.id}`;
+      this.isLoading = true;
+      this.status.loadingItem = item.id;
+      const cart = {
+        product_id: item.product_id,
+        qty: item.qty,
+      };
+      this.$http.put(url, { data: cart }).then((res) => {
+        console.log(res);
+        this.status.loadingItem = '';
+        this.getCart();
       });
     },
   },
