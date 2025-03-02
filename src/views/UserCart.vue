@@ -61,7 +61,7 @@
               <tr v-for="item in cart.carts" :key="item.id">
                 <td>
                   <button type="button" class="btn btn-outline-danger btn-sm"
-                  :disabled="status.loadingItem === item.id" @click="removeCartItem(item.id)">
+                  :disabled="this.status.loadingItem === item.id" @click="removeCartItem(item.id)">
                     <i class="bi bi-x"></i>
                   </button>
                 </td>
@@ -103,10 +103,10 @@
           <div class="input-group mb-3 input-group-sm">
             <label for="coupon_code_input">
               <input id="coupon_code_input" type="text" class="form-control"
-               placeholder="請輸入優惠碼" v-model="couponCode">
+               placeholder="請輸入優惠碼" v-model="this.couponCode">
             </label>
             <div class="input-group-append">
-              <button class="btn btn-outline-secondary" type="button" >
+              <button class="btn btn-outline-secondary" type="button" @click="addCouponCode">
                 套用優惠碼
               </button>
             </div>
@@ -158,7 +158,6 @@ export default {
         this.status.loadingItem = '';
         this.$httpMessageState(response, '加入購物車');
         this.getCart();
-        this.$router.push('/user/cart');
       });
     },
     getCart() {
@@ -173,10 +172,11 @@ export default {
     removeCartItem(id) {
       const url = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/cart/${id}`;
       this.isLoading = true;
+      this.status.loadingItem = id;
       this.$http.delete(url).then((res) => {
-        console.log(res);
         if (res.data.success) {
           this.isLoading = false;
+          this.status.loadingItem = '';
           this.getCart();
         }
       });
@@ -193,6 +193,18 @@ export default {
         console.log(res);
         this.status.loadingItem = '';
         this.getCart();
+      });
+    },
+    addCouponCode() {
+      const url = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/coupon`;
+      const coupon = {
+        code: this.couponCode,
+      };
+      this.isLoading = true;
+      this.$http.post(url, { data: coupon }).then((response) => {
+        this.$httpMessageState(response, '加入優惠券');
+        this.getCart();
+        this.isLoading = false;
       });
     },
   },
