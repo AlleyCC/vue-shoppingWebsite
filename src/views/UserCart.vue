@@ -276,7 +276,8 @@ export default {
       const order = this.form;
       this.$http.post(url, { data: order })
         .then((res) => {
-          console.log(res);
+          const { orderId } = res.data;
+          this.$router.push(`/user/checkout/${orderId}`);
         });
     },
   },
