@@ -61,7 +61,7 @@
               <tr v-for="item in cart.carts" :key="item.id">
                 <td>
                   <button type="button" class="btn btn-outline-danger btn-sm"
-                  :disabled="status.loadingItem === item.id">
+                  :disabled="status.loadingItem === item.id" @click="removeCartItem(item.id)">
                     <i class="bi bi-x"></i>
                   </button>
                 </td>
@@ -157,6 +157,7 @@ export default {
       this.$http.post(url, { data: cart }).then((response) => {
         this.status.loadingItem = '';
         this.$httpMessageState(response, '加入購物車');
+        this.getCart();
         this.$router.push('/user/cart');
       });
     },
@@ -164,9 +165,20 @@ export default {
       const url = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/cart`;
       this.isLoading = true;
       this.$http.get(url).then((response) => {
-        console.log(response);
+        console.log(url);
         this.cart = response.data.data;
         this.isLoading = false;
+      });
+    },
+    removeCartItem(id) {
+      const url = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/cart/${id}`;
+      this.isLoading = true;
+      this.$http.delete(url).then((res) => {
+        console.log(res);
+        if (res.data.success) {
+          this.isLoading = false;
+          this.getCart();
+        }
       });
     },
   },
